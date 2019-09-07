@@ -53,8 +53,10 @@
 			},
 			methods: {
 				sort: function() {
+					//如果查看最终结果，也会显示只排序的结果
+					this.onlySort();
 					// 根据","分隔元素
-					var tempArray = this.textarea2.split(".");
+					var tempArray = this.textarea2.split("、");
 					var flag = true;
 					var BeginAndEnd = null;
 					var temp = new Array();
@@ -119,7 +121,7 @@
 					this.textarea3 = tempArray.toString();
 				},
 				onlySort: function() {
-					var tempArray = this.textarea2.split(".");
+					var tempArray = this.textarea2.split("、");
 					var specialEle = new Array();
 					//替换了for循环，使用map方法，特别好使！ ^< ^------->map不能改变原始数组，不好使，还是for到位
 					for(e in tempArray) {
