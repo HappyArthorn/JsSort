@@ -13,20 +13,22 @@
 				需求分析：要排序的所有数据元素(只允许出现形如:2、3-5的元素),
 				</br>数据之间以"、"隔开,
 				</br>类似2-9的元素，排序后只保留第一个元素
-				</br>去除连续的后续元素，包括如2-9、10&nbsp;&nbsp;&nbsp;变为2
+				</br>去除连续的后续元素，包括如2-9、10&nbsp;&nbsp;变为2
 			</p>
-			<p>
-				-----点击回车键或排序按钮获取结果-----
-			</p>
-			<el-input type="textarea" :autosize="size" placeholder="请输入排序数组" @keyup.enter.native="sort" v-model="textarea2">
+			<el-input type="textarea" :autosize="size" placeholder="请输入排序数组" v-model="textarea2">
 			</el-input>
 			</br>
 			</br>
 			</br>
 			</br>
-			<el-button type="primary" @click="sort">排序</el-button>
+			<el-button type="primary" @click="onlySort">只排序</el-button>
+			<el-button type="primary" @click="sort">终极排序</el-button>
 			<p>结果：</p>
-			<el-input type="textarea" :autosize="size" v-model="textarea3">
+
+			<el-input type="textarea" :autosize="size" placeholder="只排序" v-model="textarea4">
+			</el-input>
+			&nbsp;&nbsp;
+			<el-input type="textarea" :autosize="size" placeholder="最终数据" v-model="textarea3">
 			</el-input>
 
 		</div>
@@ -47,21 +49,22 @@
 				},
 				textarea2: "",
 				textarea3: "",
+				textarea4: ""
 			},
 			methods: {
 				sort: function() {
 					// 根据","分隔元素
-					var tempArray = this.textarea2.split("、");
+					var tempArray = this.textarea2.split(".");
 					var flag = true;
 					var BeginAndEnd = null;
 					var temp = new Array();
-					var begin=0;
-					var end=0;
+					var begin = 0;
+					var end = 0;
 					//当数组中存在包含"-"的元素时，一直循环替换
 					while(flag) {
 						//格式化元素
 						for(e in tempArray) {
-//							alert(tempArray[e]);
+							//							alert(tempArray[e]);
 							//如果元素是数字，跳过
 							if((typeof tempArray[e]) == "number") {
 								continue;
@@ -70,34 +73,34 @@
 							tempArray[e] = tempArray[e].trim();
 							//找到有"-"的元素
 							if(tempArray[e].indexOf("-") != -1) {
-//								alert("当前数据：" + tempArray[e] + ",当前位置：" + e);
+								//								alert("当前数据：" + tempArray[e] + ",当前位置：" + e);
 								//如果有"-"，则填充数据
 								//获取元素的开始和结尾
 								BeginAndEnd = tempArray[e].split("-");
-								begin=Number(BeginAndEnd[0]);
-								end=Number(BeginAndEnd[1]);
-//								alert("begin:"+begin+","+typeof begin);
-//								alert("end:"+end+","+typeof end);
+								begin = Number(BeginAndEnd[0]);
+								end = Number(BeginAndEnd[1]);
+								//								alert("begin:"+begin+","+typeof begin);
+								//								alert("end:"+end+","+typeof end);
 								//定义一个数组存储新数据
 								//向temp数组中插入目标元素的中间数据
 								for(var i = begin; i <= end; i++) {
-//									alert("插入："+i);
+									//									alert("插入："+i);
 									//插入数据
 									temp.push(i);
-//									alert("temp:"+temp);
+									//									alert("temp:"+temp);
 								}
-//								alert("替换的数据：" + temp);
+								//								alert("替换的数据：" + temp);
 								//删除当前元素e
 								tempArray.splice(e, 1);
 								//在temp数组前面追加splice方法的两个参数
 								temp.unshift(e, 0);
 								//替换目标元素为temp数组
 								Array.prototype.splice.apply(tempArray, temp);
-								temp=new Array();
+								temp = new Array();
 								if(tempArray.indexOf("-") == -1) {
 									flag = false;
 								}
-//								alert("替换元素后的数据：" + tempArray);
+								//								alert("替换元素后的数据：" + tempArray);
 							}
 						}
 					}
@@ -106,7 +109,7 @@
 						return a - b
 					});
 					//去除连续的后续元素
-//					alert("排序后的数据："+tempArray);
+					//					alert("排序后的数据："+tempArray);
 					for(var i = tempArray.length - 1; i > 0; i--) {
 						if(tempArray[i] == Number(tempArray[i - 1]) + 1) {
 							tempArray.splice(i, 1);
@@ -114,6 +117,37 @@
 					}
 					//显示数据						
 					this.textarea3 = tempArray.toString();
+				},
+				onlySort: function() {
+					var tempArray = this.textarea2.split(".");
+					var specialEle = new Array();
+					//替换了for循环，使用map方法，特别好使！ ^< ^------->map不能改变原始数组，不好使，还是for到位
+					for(e in tempArray) {
+						tempArray[e] = tempArray[e].trim();
+						//替换tempArray中的特殊元素为"-"前的元素
+						if(tempArray[e].search("-") != -1) {
+							//将特殊元素插入临时数组中
+							specialEle.push(tempArray[e]);
+							//修改数据
+							var a = tempArray[e].split("-")[0];
+							//替换原数组
+							tempArray.splice(e, 1, a);
+						}
+					}
+					//排序数组
+					tempArray.sort(function(a, b) {
+						return a - b
+					});
+					//替换回原始数据
+					specialEle.map(function(str) {
+						//获取对应的数据
+						var begin = str.split("-")[0];
+						//找到tempArray中对应的数据，并替换
+						tempArray.splice(tempArray.indexOf(begin), 1, str);
+
+					});
+					//显示
+					this.textarea4 = tempArray.toString();
 				}
 			}
 
